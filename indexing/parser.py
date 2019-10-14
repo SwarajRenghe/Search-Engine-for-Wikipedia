@@ -6,6 +6,11 @@ import functools
 import heapq
 import ast
 import shutil
+import time
+
+number_pairs = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60', '61', '62', '63', '64', '65', '66', '67', '68', '69', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79', '80', '81', '82', '83', '84', '85', '86', '87', '88', '89', '90', '91', '92', '93', '94', '95', '96', '97', '98', '99']
+alphabet_pairs = ['aa', 'ab', 'ac', 'ad', 'ae', 'af', 'ag', 'ah', 'ai', 'aj', 'ak', 'al', 'am', 'an', 'ao', 'ap', 'aq', 'ar', 'as', 'at', 'au', 'av', 'aw', 'ax', 'ay', 'az', 'ba', 'bb', 'bc', 'bd', 'be', 'bf', 'bg', 'bh', 'bi', 'bj', 'bk', 'bl', 'bm', 'bn', 'bo', 'bp', 'bq', 'br', 'bs', 'bt', 'bu', 'bv', 'bw', 'bx', 'by', 'bz', 'ca', 'cb', 'cc', 'cd', 'ce', 'cf', 'cg', 'ch', 'ci', 'cj', 'ck', 'cl', 'cm', 'cn', 'co', 'cp', 'cq', 'cr', 'cs', 'ct', 'cu', 'cv', 'cw', 'cx', 'cy', 'cz', 'da', 'db', 'dc', 'dd', 'de', 'df', 'dg', 'dh', 'di', 'dj', 'dk', 'dl', 'dm', 'dn', 'do', 'dp', 'dq', 'dr', 'ds', 'dt', 'du', 'dv', 'dw', 'dx', 'dy', 'dz', 'ea', 'eb', 'ec', 'ed', 'ee', 'ef', 'eg', 'eh', 'ei', 'ej', 'ek', 'el', 'em', 'en', 'eo', 'ep', 'eq', 'er', 'es', 'et', 'eu', 'ev', 'ew', 'ex', 'ey', 'ez', 'fa', 'fb', 'fc', 'fd', 'fe', 'ff', 'fg', 'fh', 'fi', 'fj', 'fk', 'fl', 'fm', 'fn', 'fo', 'fp', 'fq', 'fr', 'fs', 'ft', 'fu', 'fv', 'fw', 'fx', 'fy', 'fz', 'ga', 'gb', 'gc', 'gd', 'ge', 'gf', 'gg', 'gh', 'gi', 'gj', 'gk', 'gl', 'gm', 'gn', 'go', 'gp', 'gq', 'gr', 'gs', 'gt', 'gu', 'gv', 'gw', 'gx', 'gy', 'gz', 'ha', 'hb', 'hc', 'hd', 'he', 'hf', 'hg', 'hh', 'hi', 'hj', 'hk', 'hl', 'hm', 'hn', 'ho', 'hp', 'hq', 'hr', 'hs', 'ht', 'hu', 'hv', 'hw', 'hx', 'hy', 'hz', 'ia', 'ib', 'ic', 'id', 'ie', 'if', 'ig', 'ih', 'ii', 'ij', 'ik', 'il', 'im', 'in', 'io', 'ip', 'iq', 'ir', 'is', 'it', 'iu', 'iv', 'iw', 'ix', 'iy', 'iz', 'ja', 'jb', 'jc', 'jd', 'je', 'jf', 'jg', 'jh', 'ji', 'jj', 'jk', 'jl', 'jm', 'jn', 'jo', 'jp', 'jq', 'jr', 'js', 'jt', 'ju', 'jv', 'jw', 'jx', 'jy', 'jz', 'ka', 'kb', 'kc', 'kd', 'ke', 'kf', 'kg', 'kh', 'ki', 'kj', 'kk', 'kl', 'km', 'kn', 'ko', 'kp', 'kq', 'kr', 'ks', 'kt', 'ku', 'kv', 'kw', 'kx', 'ky', 'kz', 'la', 'lb', 'lc', 'ld', 'le', 'lf', 'lg', 'lh', 'li', 'lj', 'lk', 'll', 'lm', 'ln', 'lo', 'lp', 'lq', 'lr', 'ls', 'lt', 'lu', 'lv', 'lw', 'lx', 'ly', 'lz', 'ma', 'mb', 'mc', 'md', 'me', 'mf', 'mg', 'mh', 'mi', 'mj', 'mk', 'ml', 'mm', 'mn', 'mo', 'mp', 'mq', 'mr', 'ms', 'mt', 'mu', 'mv', 'mw', 'mx', 'my', 'mz', 'na', 'nb', 'nc', 'nd', 'ne', 'nf', 'ng', 'nh', 'ni', 'nj', 'nk', 'nl', 'nm', 'nn', 'no', 'np', 'nq', 'nr', 'ns', 'nt', 'nu', 'nv', 'nw', 'nx', 'ny', 'nz', 'oa', 'ob', 'oc', 'od', 'oe', 'of', 'og', 'oh', 'oi', 'oj', 'ok', 'ol', 'om', 'on', 'oo', 'op', 'oq', 'or', 'os', 'ot', 'ou', 'ov', 'ow', 'ox', 'oy', 'oz', 'pa', 'pb', 'pc', 'pd', 'pe', 'pf', 'pg', 'ph', 'pi', 'pj', 'pk', 'pl', 'pm', 'pn', 'po', 'pp', 'pq', 'pr', 'ps', 'pt', 'pu', 'pv', 'pw', 'px', 'py', 'pz', 'qa', 'qb', 'qc', 'qd', 'qe', 'qf', 'qg', 'qh', 'qi', 'qj', 'qk', 'ql', 'qm', 'qn', 'qo', 'qp', 'qq', 'qr', 'qs', 'qt', 'qu', 'qv', 'qw', 'qx', 'qy', 'qz', 'ra', 'rb', 'rc', 'rd', 're', 'rf', 'rg', 'rh', 'ri', 'rj', 'rk', 'rl', 'rm', 'rn', 'ro', 'rp', 'rq', 'rr', 'rs', 'rt', 'ru', 'rv', 'rw', 'rx', 'ry', 'rz', 'sa', 'sb', 'sc', 'sd', 'se', 'sf', 'sg', 'sh', 'si', 'sj', 'sk', 'sl', 'sm', 'sn', 'so', 'sp', 'sq', 'sr', 'ss', 'st', 'su', 'sv', 'sw', 'sx', 'sy', 'sz', 'ta', 'tb', 'tc', 'td', 'te', 'tf', 'tg', 'th', 'ti', 'tj', 'tk', 'tl', 'tm', 'tn', 'to', 'tp', 'tq', 'tr', 'ts', 'tt', 'tu', 'tv', 'tw', 'tx', 'ty', 'tz', 'ua', 'ub', 'uc', 'ud', 'ue', 'uf', 'ug', 'uh', 'ui', 'uj', 'uk', 'ul', 'um', 'un', 'uo', 'up', 'uq', 'ur', 'us', 'ut', 'uu', 'uv', 'uw', 'ux', 'uy', 'uz', 'va', 'vb', 'vc', 'vd', 've', 'vf', 'vg', 'vh', 'vi', 'vj', 'vk', 'vl', 'vm', 'vn', 'vo', 'vp', 'vq', 'vr', 'vs', 'vt', 'vu', 'vv', 'vw', 'vx', 'vy', 'vz', 'wa', 'wb', 'wc', 'wd', 'we', 'wf', 'wg', 'wh', 'wi', 'wj', 'wk', 'wl', 'wm', 'wn', 'wo', 'wp', 'wq', 'wr', 'ws', 'wt', 'wu', 'wv', 'ww', 'wx', 'wy', 'wz', 'xa', 'xb', 'xc', 'xd', 'xe', 'xf', 'xg', 'xh', 'xi', 'xj', 'xk', 'xl', 'xm', 'xn', 'xo', 'xp', 'xq', 'xr', 'xs', 'xt', 'xu', 'xv', 'xw', 'xx', 'xy', 'xz', 'ya', 'yb', 'yc', 'yd', 'ye', 'yf', 'yg', 'yh', 'yi', 'yj', 'yk', 'yl', 'ym', 'yn', 'yo', 'yp', 'yq', 'yr', 'ys', 'yt', 'yu', 'yv', 'yw', 'yx', 'yy', 'yz', 'za', 'zb', 'zc', 'zd', 'ze', 'zf', 'zg', 'zh', 'zi', 'zj', 'zk', 'zl', 'zm', 'zn', 'zo', 'zp', 'zq', 'zr', 'zs', 'zt', 'zu', 'zv', 'zw', 'zx', 'zy', 'zz']
+alphabet_pairs.extend (number_pairs)
 
 class parser ():
 	def __init__ (self, output_folder, stemmer, stopwords):		
@@ -52,6 +57,10 @@ class parser ():
 
 	def parse (self, filename):
 		for event, element in self.etree.iterparse (filename, events=('start', 'end')):
+			if self.document_number > 2000:
+				print ("done with index", self.index_number)
+				self.index_number += 1
+				self.document_number = 0
 			tag_name = element.tag[43:]
 			if event == "start":
 				if tag_name == "title":
@@ -270,93 +279,95 @@ class parser ():
 			self.index_number += 1
 			self.inverted_index = inverted_index ()
 
-		f = open("titles.txt", 'wb')
-		pickle.dump (self.titles, f, -1)
-		f.close()
-
-
+		# f = open("titles.txt", 'wb')
+		# pickle.dump (self.titles, f, -1)
+		# f.close()
 
 		print ("there were", self.total_number_of_documents, "documents")
 
-	def final(self):
-		initials = "starting"
-		for count in range (self.index_number+1):
-			current_index_file =  open ("output/index_"+str(count), 'rb')
-			current_index = {}
-			try:
+
+	def make_alphabet_pairs (self):
+		os.mkdir("finals")
+		for pair in alphabet_pairs:
+			start = time.time()		
+			index = {}
+
+			for count in range (self.index_number+1):
+				current_index_file_name = None
+				flag = 0
+				current_index_file_name = "output/index_"+str(count)
+				current_index_file = open (current_index_file_name, 'rb')
+				current_index = {}
 				current_index = pickle.load (current_index_file)
-			except:
-				continue
+				current_index_file.close ()
 
-			for key in current_index:
-				if not key.isalnum() or len(key) < 2:
-					continue
-				initials = key[0:2]
-
-				index_file_name = os.path.join("output/" + "index_" + str(initials))
-				try:
-					index_file = open (index_file_name, 'rb')
-					index = pickle.load (index_file)
-				except:
-					index_file_name = os.path.join("output/" + "index_" + str(initials))
-					index_file = open (index_file_name, 'wb+')
-					index = {}
+				for key in current_index:
+					if key[0:2] != pair:
+						if flag == 1:
+							break
+						continue
+					if key[0:2] != pair:
+						flag = 1
+					if key in index:
+						index[key].extend(current_index[key])
+					else:
+						index[key] = current_index[key]
 				
-				try:
-					index[key].extend (current_index[key])
-				except:
-					index[key] = current_index[key]
-				index_file = open (index_file_name, 'wb+')
-				pickle.dump (index, index_file)
+				print ("done with index", count,"for pair", pair)
 
-			current_index_file.close()
+			index_file_name = os.path.join ("finals/" + "index_" + pair)
+			index_file = open (index_file_name, 'wb')
+			pickle.dump (index, index_file)
+			index_file.close ()
+			print ("done with pair", pair, "and it took", time.time()-start,"seconds")
+			index.clear()
 
-	def final (self):
-		initials = "starting"
-		# for count in range (self.index_number+1):
-		for count in range (1):
-			current_index_file_name = "output/index_"+str(count)
-			current_index_file = open (current_index_file_name, 'rb')
-			current_index = {}
-			current_index = pickle.load (current_index_file)
-			current_index_file.close ()
+	# def final (self):
+	# 	initials = "starting"
+	# 	# for count in range (self.index_number+1):
+	# 	for count in range (1):
+	# 		current_index_file_name = "output/index_"+str(count)
+	# 		current_index_file = open (current_index_file_name, 'rb')
+	# 		current_index = {}
+	# 		current_index = pickle.load (current_index_file)
+	# 		current_index_file.close ()
 
-			for key in current_index:
-				if not key.isalnum() or len(key) < 2:
-					continue
+	# 		for key in current_index:
+	# 			if not key.isalnum() or len(key) < 2:
+	# 				continue
 
-				if initials != key[0:2]:
-					if initials != "starting":
-						try:
-							index_file.close()
-						except:
-							pass
-						index_file = open (index_file_name, 'wb')
-						pickle.dump (index, index_file)
-						index_file.close()
-					initials = key[0:2]
-					index_file_name = os.path.join ("output/" + "index_" + str(initials))
+	# 			if initials != key[0:2]:
+	# 				if initials != "starting":
+	# 					try:
+	# 						index_file.close()
+	# 					except:
+	# 						pass
+	# 					index_file = open (index_file_name, 'wb')
+	# 					pickle.dump (index, index_file)
+	# 					index_file.close()
+	# 				initials = key[0:2]
+	# 				index_file_name = os.path.join ("output/" + "index_" + str(initials))
 
-					try:
-						index_file = open (index_file_name, 'rb')
-					except:
-						index_file = open (index_file_name, 'wb+')
+	# 				try:
+	# 					index_file = open (index_file_name, 'rb')
+	# 				except:
+	# 					index_file = open (index_file_name, 'wb+')
 
-					try:
-						index = {}
-						index = pickle.load (index_file)
-					except:
-						index = {}
+	# 				try:
+	# 					index = {}
+	# 					index = pickle.load (index_file)
+	# 				except:
+	# 					index = {}
 
-				if key in index:
-					print (index[key])
-					print (current_index[key])
-					print ()
-					print ()
-					print ()
+	# 			if key in index:
+	# 				print (index[key])
+	# 				print (current_index[key])
+	# 				print ()
+	# 				print ()
+	# 				print ()
 
-				else:
-					index[key] = current_index[key]
+	# 			else:
+	# 				index[key] = current_index[key]
 					
 						
 
