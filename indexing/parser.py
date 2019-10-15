@@ -322,6 +322,54 @@ class parser ():
 			print ("done with pair", pair, "and it took", time.time()-start,"seconds")
 			index.clear()
 
+	def make_title_indexes (self, path_to_dump):
+		document_number = 0
+		index_number = 0
+		temp_count = 0
+		titles = {}
+		# path_to_dump = "/home/lmao/3-1/IRE/Mini Project Final/60GB Corpus/enwiki-latest-pages-articles.xml"
+		self.path_to_dump = path_to_dump
+		start = time.time()
+
+		for event, element in etree.iterparse (self.path_to_dump, events=('start', 'end')):
+			tag_name = element.tag[43:]
+			if event == "start":
+				if tag_name == "title":
+					temp_count += 1
+					document_number += 1
+					if (temp_count % 10000 == 0):
+						print (temp_count / 10000, "% done of index number", index_number)
+
+			if event == "end":
+				if tag_name == "title":
+					titles [document_number] = element.text
+				if tag_name == "page":
+					element.clear ()
+			
+			if temp_count > 1000000:
+				print ("done with title index", index_number)
+				title_index_file_name = os.path.join (str("./" + "titles" + "/index_" + str (index_number)))
+				print (title_index_file_name)
+				title_index_file = open (title_index_file_name, 'ab')
+				pickle.dump (titles, title_index_file)
+				title_index_file.close ()
+				end = time.time()
+				print ("it took", end-start, "seconds for that file")
+				start = end
+				titles = {}
+				temp_count = 0
+				index_number += 1
+
+		if temp_count > 0:
+			print ("done with title index", index_number)
+			title_index_file_name = os.path.join (str("./" + "titles" + "/index_" + str (index_number)))
+			title_index_file = open (title_index_file_name, 'ab')
+			pickle.dump (titles, title_index_file)
+			title_index_file.close ()
+			titles = {}
+			temp_count = 0
+			index_number += 1
+
 	# def final (self):
 	# 	initials = "starting"
 	# 	# for count in range (self.index_number+1):
