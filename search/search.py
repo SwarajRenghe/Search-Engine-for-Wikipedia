@@ -26,10 +26,11 @@ def search(path_to_index, queries):
     search = search (a, stemmer, stopwords)
     outputs = []
     for query in queries:
-        if search.search (query) is None:
+        the_result = search.search (query)
+        if the_result is None:
             outputs.append (['.'] * 10)
         else:
-            outputs.append (search.search (query))
+            outputs.append (the_result)
     return outputs
 
 def main():
@@ -39,6 +40,7 @@ def main():
 
     queries = read_file(testfile)
     outputs = search(path_to_index, queries)
+    # print (outputs)
     write_file(outputs, path_to_output)
 
 

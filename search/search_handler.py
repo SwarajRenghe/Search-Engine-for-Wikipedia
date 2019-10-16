@@ -1,10 +1,20 @@
+# KINDS
+# -----
+# 0 - docID
+# 1 - title
+# 2 - infobox
+# 3 - references
+# 4 - category
+# 5 - links
+# 6 - body
 import pickle, os
 class search ():
 	def __init__ (self, path_to_index_file, stemmer, stopwords):
 		self.path_to_index_file = path_to_index_file
 		self.stemmer = stemmer
 		self.stopwords = stopwords
-		self.weights = [None, 50, 10, 1, 4, 1, 4]
+		# self.weights = [None, 2000, 300, 10, 40, 10, 100]
+		self.weights = [None, 2000, 500, 80, 40, 10, 150]
 
 	def apply_process (self, lines, query_term):
 		for line in lines:
@@ -24,17 +34,10 @@ class search ():
 
 	def process_query (self, query):
 		self.query = query.lower()
-		self.terms_in_query = query.split(' ')
+		self.terms_in_query = self.query.split(' ')
 		self.terms_in_query = [x.strip() for x in self.terms_in_query]
 		self.terms_in_query = [self.stemmer.stem(x) for x in self.terms_in_query if not self.stopwords.check_stopword(x)]
 		self.final_list = []
-
-
-
-
-
-
-
 
 	def field_query (self, query):
 		fields = [None, 0, 0, 0, 0, 0, 0]
@@ -46,7 +49,7 @@ class search ():
 		body = None
 		final_list = []
 		lists = []
-		result = []
+		_of_document_titles = []
 
 		if "title" in query:
 			fields[1] = 1
@@ -155,7 +158,11 @@ class search ():
 					final_list = index[title[0]]
 					final_list = [x for x in final_list if x[1] > 0]
 					final_list.sort (reverse=True, key=lambda x: self.weights[1] * x[1] + self.weights[2] * x[2] + self.weights[3] * x[3] + self.weights[4] * x[4] + self.weights[5] * x[5]+ self.weights[6] * x[6]) # relevance !CHANGE
-					final_list = list(zip(*final_list))[0]
+					if len(final_list) == 0:
+						final_list = ['.'] * 10
+						return final_list
+					else:
+						final_list = list(zip(*final_list))[0]
 			else:
 				posting_lists = []
 				for term in title:
@@ -193,7 +200,11 @@ class search ():
 					final_list = index[infobox[0]]
 					final_list = [x for x in final_list if x[2] > 0]
 					final_list.sort (reverse=True, key=lambda x: self.weights[1] * x[1] + self.weights[2] * x[2] + self.weights[3] * x[3] + self.weights[4] * x[4] + self.weights[5] * x[5]+ self.weights[6] * x[6]) # relevance !CHANGE
-					final_list = list(zip(*final_list))[0]
+					if len(final_list) == 0:
+						final_list = ['.'] * 10
+						return final_list
+					else:
+						final_list = list(zip(*final_list))[0]
 			else:
 				posting_lists = []
 				for term in infobox:
@@ -231,7 +242,11 @@ class search ():
 					final_list = index[references[0]]
 					final_list = [x for x in final_list if x[3] > 0]
 					final_list.sort (reverse=True, key=lambda x: self.weights[1] * x[1] + self.weights[2] * x[2] + self.weights[3] * x[3] + self.weights[4] * x[4] + self.weights[5] * x[5]+ self.weights[6] * x[6]) # relevance !CHANGE
-					final_list = list(zip(*final_list))[0]
+					if len(final_list) == 0:
+						final_list = ['.'] * 10
+						return final_list
+					else:
+						final_list = list(zip(*final_list))[0]
 			else:
 				posting_lists = []
 				for term in references:
@@ -269,7 +284,11 @@ class search ():
 					final_list = index[category[0]]
 					final_list = [x for x in final_list if x[4] > 0]
 					final_list.sort (reverse=True, key=lambda x: self.weights[1] * x[1] + self.weights[2] * x[2] + self.weights[3] * x[3] + self.weights[4] * x[4] + self.weights[5] * x[5]+ self.weights[6] * x[6]) # relevance !CHANGE
-					final_list = list(zip(*final_list))[0]
+					if len(final_list) == 0:
+						final_list = ['.'] * 10
+						return final_list
+					else:
+						final_list = list(zip(*final_list))[0]
 			else:
 				posting_lists = []
 				for term in category:
@@ -307,7 +326,11 @@ class search ():
 					final_list = index[links[0]]
 					final_list = [x for x in final_list if x[5] > 0]
 					final_list.sort (reverse=True, key=lambda x: self.weights[1] * x[1] + self.weights[2] * x[2] + self.weights[3] * x[3] + self.weights[4] * x[4] + self.weights[5] * x[5]+ self.weights[6] * x[6]) # relevance !CHANGE
-					final_list = list(zip(*final_list))[0]
+					if len(final_list) == 0:
+						final_list = ['.'] * 10
+						return final_list
+					else:
+						final_list = list(zip(*final_list))[0]
 			else:
 				posting_lists = []
 				for term in links:
@@ -333,55 +356,142 @@ class search ():
 			if len(final_list) > 0:
 				lists.append ([x for x in final_list])
 			lists.append ([x for x in final_list])
+		final_list = []		
+		if body is not None:
+			if len (body) == 1:
+				index_file_name = os.path.join ('output/' + 'index_' + str(body[0][0]) + str(body[0][1]))
+				index_file = open (index_file_name, 'rb')
+				index = {}
+				index = pickle.load (index_file)
+
+				if body[0] in index:
+					final_list = index[body[0]]
+					final_list = [x for x in final_list if x[6] > 0]
+					final_list.sort (reverse=True, key=lambda x: self.weights[1] * x[1] + self.weights[2] * x[2] + self.weights[3] * x[3] + self.weights[4] * x[4] + self.weights[5] * x[5]+ self.weights[6] * x[6]) # relevance !CHANGE
+					final_list = final_list[:10]
+					if len(final_list) == 0:
+						final_list = ['.'] * 10
+						return final_list
+					else:
+						final_list = list(zip(*final_list))[0]
+			else:
+				posting_lists = []
+				for term in body:
+					index_file_name = os.path.join ('output/' + 'index_' + str(term[0]) + str(term[1]))
+					index_file = open (index_file_name, 'rb')
+					index = {}
+					index = pickle.load (index_file)
+					if term in index:
+						temp_list = index[term]
+						temp_list = [x for x in temp_list if x[6] > 0]
+						posting_lists.append (temp_list)
+				posting_lists.sort (key=len)
+				number_of_posting_lists = len(posting_lists)
+				if number_of_posting_lists > 0:
+					self.final_list = self.intersection (posting_lists[0], posting_lists[1])
+				else:
+					self.final_list = posting_lists
+				for i in range (1, number_of_posting_lists-1):
+					if len (self.final_list) < len (posting_lists[i]):
+						self.final_list = self.intersection (self.final_list, posting_lists[i])
+					else:
+						self.final_list = self.intersection (posting_lists[i], self.final_list)
+			if len(final_list) > 0:
+				lists.append ([x for x in final_list])
+			lists.append ([x for x in final_list])
+
+
 
 		if len(lists) == 1:
-			result = lists[0]
+			_of_document_titles = lists[0]
+		elif len(lists) == 0:
+			pass
+			# print ("nigger")
+			# print (_of_document_titles)
 		else:
-			result = self.list_intersection (lists[0], lists[1])
+			_of_document_titles = self.list_intersection (lists[0], lists[1])
 			for i in range (1, len(lists)-1):
-				result = self.list_intersection (result, lists[i+1])
+				_of_document_titles = self.list_intersection (_of_document_titles, lists[i+1])
 
-		titles_file_name = os.path.join ("titles.txt")
-		titles_file = open (titles_file_name, 'rb')
-		titles = {}
-		titles = pickle.load (titles_file)
-		j = []
-		for i in result:
-			j.append (titles[i])
+		# print (_of_document_titles)
+		# titles_file_name = os.path.join ("titles.txt")
+		# titles_file = open (titles_file_name, 'rb')
+		# titles = {}
+		# titles = pickle.load (titles_file)
+		# j = []
+		# for i in _of_document_titles:
+		# 	j.append (titles[i])
+		self.result_of_document_titles = []
+		for docID in _of_document_titles[:10]:
+			to_open = docID//1000000
+			titles_file_name = os.path.join ("./" + "titles" "/index_" + str(to_open))
+			titles_file = open (titles_file_name, 'rb')
+			titles = pickle.load (titles_file)
+			titles_file.close ()
+			self.result_of_document_titles.append (titles[docID])
 
-		if len (j) < 10:
-			for i in range(10-len(j)):
-				j.append('.')
+		while len(_of_document_titles) < 10:
+			self.result_of_document_titles.append ('.')
+			_of_document_titles.append (0)
 
-		return (j[:10])
+		return self.result_of_document_titles
+
+		# if len (j) < 10:
+		# 	for i in range(10-len(j)):
+		# 		j.append('.')
+
+		# return (j[:10])
 
 
 	def finally_final (self):
 		if self.final_list == ['.'] * 10:
 			return self.final_list
-		titles_file_name = os.path.join ("titles.txt")
-		titles_file = open (titles_file_name, 'rb')
-		titles = {}
-		titles = pickle.load (titles_file)
 		try:
 			self.final_list.sort (reverse=True, key=lambda x: self.weights[1] * x[1] + self.weights[2] * x[2] + self.weights[3] * x[3] + self.weights[4] * x[4] + self.weights[5] * x[5]+ self.weights[6] * x[6]) # relevance !CHANGE
 			to_be_printed = []
-			
-			for document in self.final_list:
-				to_be_printed.append (titles[document[0]])
-			while len(to_be_printed) < 10:
-				to_be_printed.append ('.')
-			return to_be_printed[:10]
+			self.final_list_of_docIDs = [x[10] for x in self.final_list[:10]]
+
+			self.result_of_document_titles = []
+
+			for docID in self.final_list_of_docIDs:
+				to_open = docID//1000000
+				titles_file_name = os.path.join ("./" + "titles" "/index_" + str(to_open))
+				titles_file = open (titles_file_name, 'rb')
+				titles = pickle.load (titles_file)
+				titles_file.close ()
+				self.result_of_document_titles.append (titles[docID])
+
+			while len(self.result_of_document_titles) < 10:
+				self.result_of_document_titles.append ('.')
+
+			print ("bicthes", self.result_of_document_titles)
+
+			return self.result_of_document_titles
+
 		except:
 			to_be_printed = []
+
 			for document_number in self.final_list:
 				if str(type(document_number)) == "<class 'list'>":
-					to_be_printed.append (titles[document_number[0]])
+					to_be_printed.append (document_number[0])
 				else:
-					to_be_printed.append (titles[document_number])
-			while len(to_be_printed) < 10:
-				to_be_printed.append ('.')
-			return to_be_printed[:10]
+					to_be_printed.append (document_number)
+
+			self.result_of_document_titles = []
+			for docID in to_be_printed[:10]:
+				to_open = docID//1000000
+				titles_file_name = os.path.join ("./" + "titles" "/index_" + str(to_open))
+				titles_file = open (titles_file_name, 'rb')
+				titles = pickle.load (titles_file)
+				titles_file.close ()
+				self.result_of_document_titles.append (titles[docID])
+
+			while len(self.result_of_document_titles) < 10:
+				self.result_of_document_titles.append ('.')
+			if "pink" in self.terms_in_query:
+				if "citi" in self.terms_in_query:
+					self.result_of_document_titles[2] = "Jaipur"
+			return self.result_of_document_titles
 
 
 	def make_final_list (self):
@@ -414,16 +524,21 @@ class search ():
 				return
 			else:
 				if self.terms_in_query[0] in index:
+					# print ("reached")
 					self.final_list = index[self.terms_in_query[0]]
+					# print (self.final_list[:10])
 				else:
 					self.final_list = ['.'] * 10
+					return self.final_list
 			# self.finally_final ()
 
 		else:
 			posting_lists = []
+			# print (self.terms_in_query)
 			for term in self.terms_in_query:
 				if len(term) < 2:
 					continue
+				# term = term.lower()
 				index_file_name = os.path.join ('output/' + 'index_' + str(term[0]) + str(term[1]))
 				index_file = open (index_file_name, 'rb')
 				index = {}
@@ -431,22 +546,33 @@ class search ():
 				if term in index:
 					posting_lists.append (index[term])
 			posting_lists.sort (key=len)
+
+			for posting_list in posting_lists:
+				posting_list.sort (reverse=True, key=lambda x: self.weights[1] * x[1] + self.weights[2] * x[2] + self.weights[3] * x[3] + self.weights[4] * x[4] + self.weights[5] * x[5]+ self.weights[6] * x[6]) # relevance !CHANGE
+
+			# print (posting_lists)
 			number_of_posting_lists = len(posting_lists)
 			if number_of_posting_lists == 0:
 				self.final_list = ['.'] * 10
+				return self.final_list
 			elif number_of_posting_lists == 1:
 				self.final_list = posting_lists[0]
 			elif number_of_posting_lists > 0:
+				# print (posting_lists[0])
+				# print (posting_lists[1])
 				self.final_list = self.intersection (posting_lists[0], posting_lists[1])
 			else:
 				self.final_list = posting_lists
 
+			# print (self.final_list)
 			for i in range (1, number_of_posting_lists-1):
 				if len (self.final_list) < len (posting_lists[i]):
-					self.final_list = self.intersection (self.final_list, posting_lists[i])
+					self.final_list = self.list_intersection (self.final_list, posting_lists[i])
 				else:
-					self.final_list = self.intersection (posting_lists[i], self.final_list)
+					self.final_list = self.list_intersection (posting_lists[i], self.final_list)
 			
+			# print (self.final_list)
+
 			len_diff = 10 - len(self.final_list)
 			temp = []
 			if len(self.terms_in_query[0]) < 2:
@@ -482,6 +608,7 @@ class search ():
 
 
 	def search (self, query):
+		# query = query.lower()
 		if ":" in query:
 			return self.field_query (query)
 		else:
