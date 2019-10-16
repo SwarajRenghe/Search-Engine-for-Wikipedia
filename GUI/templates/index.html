@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Wikipedia Search Engine </title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<link href="https://fonts.googleapis.com/css?family=Hepta+Slab&display=swap" rel="stylesheet">
+</head>
+
+<style type="text/css">
+	.title {
+		font-family: 'Hepta Slab', serif;
+		font-size: 130px;
+		text-align: center;
+		padding: 20px 0;
+	}
+	.searchbar {
+		text-align: center;
+		font-family: 'Hepta Slab', serif;
+		font-size: 50px;
+		width: 800px;
+		padding: 30px;
+	}
+	.placeholder {
+		text-align: center;
+	}
+	.checkbox {
+		text-align: center;
+		font-family: 'Hepta Slab', serif;
+		font-size: 20px;
+	}
+	.back {
+		text-align: center;
+		font-family: 'Hepta Slab', serif;
+		font-size: 30px;
+	}
+</style>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#my_form').keydown(function() {
+			if (key == 13) {
+				$('#my_form').submit();
+			}
+		});
+	});
+</script>
+
+<body>
+	<p class="title"> wikipedia </p>
+	<div class="placeholder">
+		<form id="my_form" action="http://localhost:5000/result" method="POST">
+		  <input name="query" autofocus required class="searchbar" placeholder="Search...">
+		  <table style="width: 100%; text-align: center;">
+		  	<tr  style="text-align: center;">
+		  		<td> <p class="checkbox"> Title </p> <input class="checkbox" type="text" name="title" placeholder="title"> </td>
+		  		<td> <p class="checkbox"> Infobox </p> <input class="checkbox" type="text" name="infobox" placeholder="infobox">  </td>
+		  		<td> <p class="checkbox"> References </p> <input class="checkbox" type="text" name="references" placeholder="references">  </td>
+		  	</tr>
+		  	<tr  style="text-align: center;">
+		  		<td> <p class="checkbox"> Category </p> <input class="checkbox" type="text" name="category" placeholder="category">   </td>
+		  		<td>  <p class="checkbox"> Links </p> <input class="checkbox" type="text" name="links" placeholder="links">  </td>
+		  		<td> <br/> <p class="checkbox"> Body </p> <input class="checkbox" type="text" name="body" placeholder="body">  </td>
+		  	</tr>
+		  </table>
+		  <br/> 
+		  <input type="submit" class="back"/>
+		</form>
+	</div>
+</div>
+</body>
+</html>
