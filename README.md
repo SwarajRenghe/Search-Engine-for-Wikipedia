@@ -5,8 +5,9 @@ Latest dumps can be found at - https://dumps.wikimedia.org/backup-index.html
 
 
 ## GUI
-A simple, clean GUI made in flask to ease interaction with the search engine.
+ - A simple, clean GUI made in flask to ease interaction with the search engine.
 ![Homepage](/screenshots/homepage.png)
+- The GUI makes our search results more comprehensible. Here is an example, when you search for 'Bon Jovi'
 ![A search result](/screenshots/search.png)
 
 ## Installation
